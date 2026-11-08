@@ -1,0 +1,42 @@
+{
+ "scorer only (LightGBM), tau 0.18": {
+  "refined": 0.4621210476745898,
+  "seed_masks": 0.46003570645620695,
+  "tau": 0.18
+ },
+ "scorer only (LightGBM), tau 0.20": {
+  "refined": 0.46187807224443356,
+  "seed_masks": 0.4601946792851731,
+  "tau": 0.2
+ },
+ "scorer only (LightGBM), tau 0.22": {
+  "refined": 0.4614246483579361,
+  "seed_masks": 0.4599534644707761,
+  "tau": 0.22
+ },
+ "scorer only (LightGBM), tau 0.24": {
+  "refined": 0.46105949247748595,
+  "seed_masks": 0.4598713664244395,
+  "tau": 0.24
+ },
+ "scorer only (LightGBM), tau 0.26": {
+  "refined": 0.4603980086564789,
+  "seed_masks": 0.45908466662467523,
+  "tau": 0.26
+ },
+ "mean(LightGBM, rsxE)": {
+  "refined": 0.46570771900486424,
+  "seed_masks": 0.464662069808092,
+  "tau": 0.26
+ },
+ "mean(LightGBM, rso4)": {
+  "refined": 0.4669041464516129,
+  "seed_masks": 0.46587826156597983,
+  "tau": 0.26
+ },
+ "mean(LightGBM, rsAll) = final": {
+  "refined": 0.46685059829058845,
+  "seed_masks": 0.4660232808817796,
+  "tau": 0.26
+ }
+}

@@ -1,0 +1,46 @@
+[
+ [
+  "single effv2-s U-Net, 1024 px, CC rule (2 folds)",
+  0.44
+ ],
+ [
+  "+ learned LightGBM selection",
+  0.449
+ ],
+ [
+  "single model, 1536 px crops (shared scorer)",
+  0.4539
+ ],
+ [
+  "teacher ensemble ensB (own scorer)",
+  0.4607
+ ],
+ [
+  "+ crop refiner",
+  0.4637
+ ],
+ [
+  "+ CNN rescorer, 4 seeds (rsqE)",
+  0.4668
+ ],
+ [
+  "s15: + 3 rescorer groups (rsAll)",
+  0.4678
+ ],
+ [
+  "3 distilled students eS (own scorer)",
+  0.4608
+ ],
+ [
+  "+ crop refiner ",
+  0.4619
+ ],
+ [
+  "+ CNN rescorer, 3 seeds (rsxE)",
+  0.4657
+ ],
+ [
+  "s16: + 2 rescorer groups (rsAll)",
+  0.4669
+ ]
+]
