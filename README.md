@@ -89,7 +89,8 @@ All outputs go below `WORK`.
 
 ### Weights
 
-Total 7.4 GB (inference bundle; see `final/weights_manifest.csv` for every file with size and sha256):
+Inference bundle 7.33 GB (s15 alone 6.80 GB, s16 alone 2.54 GB), plus 0.98 GB of fold refiners for the OOF check;
+`final/weights_manifest.csv` lists every file with size, sha256 and the picks that use it:
 
 ```
 WEIGHTS/
@@ -128,7 +129,8 @@ python -m filseg.pipeline --config final/s16.json --split oof --data DATA --work
 python -m filseg.evaluate --pred WORK/oof_s15.csv --work WORK --out_dir figures --name s15
 ```
 
-The OOF run predicts each training frame with the fold model that did not see it, refits the cross-fitted
+Needs the fold refiners (`refiner/*_f{0..4}.pt`, bundle `oof` in the manifest). The OOF run predicts each
+training frame with the fold model that did not see it, refits the cross-fitted
 LightGBM scorer (on identical candidate tables the refit is bit-identical to the released boosters), rebuilds the rescorer training pool (`final/pool.json`,
 the OOF crops of 12 candidate sets made from the same dense runs) and retrains the fold rescorers (about one
 minute each on an H200; their checkpoints are not part of the weights bundle). The pooled and per-fold PQ are
@@ -204,15 +206,18 @@ Checks run on 2026-11-08 (`filseg.compare` reproduces them):
 | rescorer checkpoints (not kept during development) retrained with the release code, same seeds and training pool, H200 | the test outputs of all 13 networks are bit-identical to the development runs; these retrained networks are the released checkpoints |
 | full inference from the released weights in a fresh environment (`uv pip install -r requirements.txt`), H200 | s15: 1157 / 1157 filaments, 986 identical masks, the rest matched with IoU >= 0.95 (mean IoU 0.9998), PQ of our CSV against the submitted one 0.9998. s16: 1089 / 1089, 721 identical, IoU >= 0.98, PQ 0.9997 |
 | full inference, RTX 3090 (CUDA 12.6 wheels) | s16: 1089 / 1089 filaments, 1088 matched (632 identical masks, mean IoU 0.9995, min 0.978), PQ against the submitted file 0.9986 |
-| OOF from the released weights (5 folds; scorer refit, rescorer pool rebuilt, fold rescorers retrained) | REPRO_OOF |
+| OOF from the released weights (5 folds; scorer refit, rescorer pool rebuilt, fold rescorers retrained) | s15 0.4672 (development 0.4678; folds 0.4579 / 0.4645 / 0.4746 / 0.4920 / 0.4477 vs 0.4600 / 0.4657 / 0.4741 / 0.4904 / 0.4497). s16 0.4664 (development 0.4669; folds 0.4561 / 0.4633 / 0.4741 / 0.4894 / 0.4502 vs 0.4542 / 0.4636 / 0.4719 / 0.4910 / 0.4543) |
 
 Why the inference is not byte-identical: recomputed on the same GPU type and precision, the dense models are
-bit-identical (the 30 test fold-maps that were computed on H200s during development). The other 15 had been computed
-on V100s (fp16) or an RTX 3090; recomputing them on an H200 changes about 1e-4 of the pixels of a map (isolated
+bit-identical (the 30 test fold-maps and 4243 of the 6363 OOF frame maps of s15 that were computed on H200s during
+development). The other 15 test fold-maps (and the matching OOF maps) had been computed on V100s (fp16) or an
+RTX 3090; recomputing them on an H200 changes about 1e-4 of the pixels of a map (isolated
 pixels, by a few uint8 levels). This moves some component boundaries by a pixel and changes the refiner inputs
 slightly; scores change by 3e-4 (LightGBM) and 1e-4 (rescorer) on average and no keep decision changes. Every later
 stage is deterministic given its inputs (LightGBM refits are bit-identical, and so are the rescorer and refiner
-outputs on the same GPU type).
+outputs on the same GPU type). In the OOF run the small map differences also change the candidate tables that the
+scorer is refit on and from which the rescorer training pool is rebuilt, and the fold rescorers are retrained on that
+pool; the resulting OOF PQ differs from the development value by -0.0006 (s15) and -0.0004 (s16).
 
 ## License
 
