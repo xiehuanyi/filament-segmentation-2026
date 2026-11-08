@@ -57,12 +57,16 @@ Each pick is fully described by one configuration file: `final/s15.json`, `final
 | `final/pool.json` | candidate sets that form the rescorer training pool |
 | `final/weights_manifest.csv` | every weight file with size and sha256 |
 | `scripts/train_from_scratch.sh` | the full training recipe, stage by stage |
+| `scripts/get_weights.py` | downloads the weights (optional) and checks them against the manifest |
+| `scripts/make_manifest.py`, `scripts/report_figures.py` | weights manifest; per-stage PQ, example overlays and the ablation chart |
+| `experiments/` | analysis scripts (selection oracle, annotator agreement, human baselines) |
 | `demo.ipynb` | end-to-end demo on the test frames with overlays |
 | `figures/` | evaluation figures (OOF) |
 
 ## Setup
 
-Python 3.11 and an NVIDIA GPU (tested on H200 and RTX 3090; the dense models need ~10 GB of GPU memory at 2048 px).
+Python 3.11 and an NVIDIA GPU. Inference was run on H200 and RTX 3090 GPUs (teacher maps also on an 11 GB RTX
+2080 Ti); training used H200 (most folds), V100 32 GB and RTX 3090 GPUs.
 
 ```bash
 uv venv --python 3.11 .venv && source .venv/bin/activate
@@ -95,7 +99,8 @@ WEIGHTS/
   rescorer/{ensB,eS}_<name>_full.pt                  13 full-data rescorers
 ```
 
-Download: TODO (link to the hosted weights).
+Download: TODO (link to the hosted weights). Check a weights folder with
+`python scripts/get_weights.py --out WEIGHTS` (all files and sha256; `--pick s16` for one pick only).
 
 ## Reproduce the submissions (inference from the released weights)
 
@@ -190,7 +195,23 @@ Public leaderboard (about 90 test frames, rounded to 0.01): 0.40 for both picks.
 
 ## Reproducibility
 
-REPRO_SECTION
+Checks run on 2026-11-08 (`filseg.compare` reproduces them):
+
+| check | result |
+|---|---|
+| release code vs development code on identical inputs (the development probability maps, refined crops and rescorer outputs) | every intermediate file is identical: folds, ground truth and targets; candidate tables (s15: 12003 test / 46805 OOF candidates, s16: 1859 / 7222); LightGBM boosters and cross-fitted scores; crops and extra channels. Both submitted CSVs are reproduced **byte for byte**; OOF PQ 0.4678 (s15) and 0.4669 (s16) |
+| rescorer checkpoints (not kept during development) retrained with the release code, same seeds and training pool, H200 | the test outputs of all 13 networks are bit-identical to the development runs; these retrained networks are the released checkpoints |
+| full inference from the released weights in a fresh environment (`uv pip install -r requirements.txt`), H200 | s15: 1157 / 1157 filaments, 986 identical masks, the rest matched with IoU >= 0.95 (mean IoU 0.9998), PQ of our CSV against the submitted one 0.9998. s16: 1089 / 1089, 721 identical, IoU >= 0.98, PQ 0.9997 |
+| full inference, RTX 3090 (CUDA 12.6 wheels) | REPRO_3090 |
+| OOF from the released weights (5 folds; scorer refit, rescorer pool rebuilt, fold rescorers retrained) | REPRO_OOF |
+
+Why the inference is not byte-identical: recomputed on the same GPU type and precision, the dense models are
+bit-identical (the 30 test fold-maps that were computed on H200s during development). The other 15 had been computed
+on V100s (fp16) or an RTX 3090; recomputing them on an H200 changes about 1e-4 of the pixels of a map (isolated
+pixels, by a few uint8 levels). This moves some component boundaries by a pixel and changes the refiner inputs
+slightly; scores change by 3e-4 (LightGBM) and 1e-4 (rescorer) on average and no keep decision changes. Every later
+stage is deterministic given its inputs (LightGBM refits are bit-identical, and so are the rescorer and refiner
+outputs on the same GPU type).
 
 ## License
 
