@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+# data, work files and weights are not part of the repository
+data/
+work*/
+weights/
+*.pt
+*.npz
+*.pkl
+submission_*.csv

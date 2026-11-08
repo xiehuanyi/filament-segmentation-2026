@@ -1,0 +1,18 @@
+# Python 3.11. Tested with CUDA 12.8 wheels on NVIDIA H200 (orix) and RTX 3090.
+# For another CUDA version replace the index below (e.g. .../whl/cu126) and the +cu128 suffixes.
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.7.1+cu128
+torchvision==0.22.1+cu128
+segmentation-models-pytorch==0.5.0
+timm==1.0.30
+huggingface-hub==2.4.0
+numpy==2.4.6
+scipy==1.17.1
+opencv-python-headless==5.0.0.93
+pycocotools==2.0.11
+lightgbm==4.7.0
+pandas==3.1.0
+matplotlib==3.11.2
+# demo notebook (python -m jupyter nbconvert --execute demo.ipynb)
+nbconvert==7.17.2
+ipykernel==7.4.0

@@ -1,0 +1,209 @@
+{
+ "about": "Candidate sets whose OOF refiner crops form the CNN rescorer training pool (the rescorer groups' train_tags), and the probability maps they use. All are built from the same dense runs; e1 and e13 use the TTA-4 maps written at the end of training (map names e1_effv2s, e3_effv2s_flat).",
+ "maps": {
+  "e6_effv2s_c1536": {
+   "run": "e6_effv2s_c1536",
+   "tta": 8
+  },
+  "e10_effv2m_c1536": {
+   "run": "e10_effv2m_c1536",
+   "tta": 8
+  },
+  "e12_effv2s_flat_c1536": {
+   "run": "e12_effv2s_flat_c1536",
+   "tta": 8
+  },
+  "e1_tta8": {
+   "run": "e1_effv2s",
+   "tta": 8
+  },
+  "e3_tta8": {
+   "run": "e3_effv2s_flat",
+   "tta": 8
+  },
+  "e7_tta8": {
+   "run": "e7_effv2m",
+   "tta": 8
+  },
+  "e31_kd_effv2s_c1536": {
+   "run": "e31_kd_effv2s_c1536",
+   "tta": 8
+  },
+  "e33_kd_effv2m_c1536": {
+   "run": "e33_kd_effv2m_c1536",
+   "tta": 8
+  },
+  "e34_kd_effv2s_flat_c1536": {
+   "run": "e34_kd_effv2s_flat_c1536",
+   "tta": 8
+  },
+  "e1_effv2s": {
+   "run": "e1_effv2s",
+   "tta": 4
+  },
+  "e3_effv2s_flat": {
+   "run": "e3_effv2s_flat",
+   "tta": 4
+  }
+ },
+ "tags": {
+  "ensB": {
+   "members": [
+    "e6_effv2s_c1536:2",
+    "e10_effv2m_c1536:2",
+    "e12_effv2s_flat_c1536:2",
+    "e1_tta8",
+    "e3_tta8",
+    "e7_tta8"
+   ],
+   "thresholds": [
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8
+   ]
+  },
+  "ensA": {
+   "members": [
+    "e6_effv2s_c1536",
+    "e10_effv2m_c1536",
+    "e12_effv2s_flat_c1536"
+   ],
+   "thresholds": [
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8
+   ]
+  },
+  "ens4w": {
+   "members": [
+    "e1_tta8",
+    "e3_tta8",
+    "e7_tta8",
+    "e6_effv2s_c1536:3"
+   ],
+   "thresholds": [
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8
+   ]
+  },
+  "e6t8": {
+   "members": [
+    "e6_effv2s_c1536"
+   ],
+   "thresholds": [
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8
+   ]
+  },
+  "e137t8": {
+   "members": [
+    "e1_tta8",
+    "e3_tta8",
+    "e7_tta8"
+   ],
+   "thresholds": [
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8
+   ]
+  },
+  "e13": {
+   "members": [
+    "e1_effv2s",
+    "e3_effv2s_flat"
+   ],
+   "thresholds": [
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8
+   ]
+  },
+  "e1": {
+   "members": [
+    "e1_effv2s"
+   ],
+   "thresholds": [
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8
+   ]
+  },
+  "eS": {
+   "members": [
+    "e31_kd_effv2s_c1536",
+    "e33_kd_effv2m_c1536",
+    "e34_kd_effv2s_flat_c1536"
+   ],
+   "thresholds": [
+    0.3
+   ]
+  },
+  "eSA": {
+   "members": [
+    "e31_kd_effv2s_c1536",
+    "e33_kd_effv2m_c1536",
+    "e34_kd_effv2s_flat_c1536",
+    "e6_effv2s_c1536",
+    "e10_effv2m_c1536",
+    "e12_effv2s_flat_c1536"
+   ],
+   "thresholds": [
+    0.3
+   ]
+  },
+  "r31": {
+   "members": [
+    "e31_kd_effv2s_c1536"
+   ],
+   "thresholds": [
+    0.3
+   ]
+  },
+  "r33": {
+   "members": [
+    "e33_kd_effv2m_c1536"
+   ],
+   "thresholds": [
+    0.3
+   ]
+  },
+  "r34": {
+   "members": [
+    "e34_kd_effv2s_flat_c1536"
+   ],
+   "thresholds": [
+    0.3
+   ]
+  }
+ }
+}

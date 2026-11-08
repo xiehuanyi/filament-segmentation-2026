@@ -1,0 +1,98 @@
+{
+ "name": "s16",
+ "summary": "3 distilled students (eS) -> LightGBM scorer -> crop refiner (0.5) -> score = mean(LGB, mean of 2 CNN rescorers) > 0.26",
+ "kaggle_submission_id": 57951808,
+ "submitted_file": "s16_eS_ref050_rsAll.csv",
+ "cv_pq": 0.4669,
+ "tag": "eS",
+ "maps": {
+  "e31_kd_effv2s_c1536": {
+   "run": "e31_kd_effv2s_c1536",
+   "tta": 8
+  },
+  "e33_kd_effv2m_c1536": {
+   "run": "e33_kd_effv2m_c1536",
+   "tta": 8
+  },
+  "e34_kd_effv2s_flat_c1536": {
+   "run": "e34_kd_effv2s_flat_c1536",
+   "tta": 8
+  }
+ },
+ "ensemble": [
+  "e31_kd_effv2s_c1536",
+  "e33_kd_effv2m_c1536",
+  "e34_kd_effv2s_flat_c1536"
+ ],
+ "thresholds": [
+  0.3
+ ],
+ "crops": {
+  "sel_t": 0.3,
+  "min_q": 0.08,
+  "sel_tau": 0.18
+ },
+ "refiner": {
+  "ckpt": "eS_refiner.pt",
+  "fold_ckpt": "eS_refiner_f{k}.pt",
+  "amp": "bf16",
+  "thr": 0.5
+ },
+ "xc": null,
+ "rescorer": {
+  "groups": {
+   "rsxE": {
+    "epochs": 4,
+    "train_tags": [
+     "ensB",
+     "ensA",
+     "ens4w",
+     "e6t8",
+     "e137t8",
+     "e13",
+     "e1",
+     "eS",
+     "eSA",
+     "r31",
+     "r33",
+     "r34"
+    ],
+    "xc": false,
+    "members": [
+     {
+      "name": "rsx_s0",
+      "seed": 0
+     },
+     {
+      "name": "rsx_s1",
+      "seed": 1
+     },
+     {
+      "name": "rsx_s2",
+      "seed": 2
+     }
+    ]
+   },
+   "rso4": {
+    "epochs": 12,
+    "train_tags": [
+     "eS"
+    ],
+    "xc": false,
+    "members": [
+     {
+      "name": "rso4_s0",
+      "seed": 0
+     },
+     {
+      "name": "rso4_s1",
+      "seed": 1
+     }
+    ]
+   }
+  },
+  "combine": "rsAll",
+  "w_cnn": 0.5
+ },
+ "tau": 0.26
+}
