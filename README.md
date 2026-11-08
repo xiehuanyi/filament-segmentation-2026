@@ -61,7 +61,7 @@ Each pick is fully described by one configuration file: `final/s15.json`, `final
 | `scripts/make_manifest.py`, `scripts/report_figures.py` | weights manifest; per-stage PQ, example overlays and the ablation chart |
 | `experiments/` | analysis scripts (selection oracle, annotator agreement, human baselines) |
 | `demo.ipynb` | end-to-end demo on the test frames with overlays |
-| `figures/` | evaluation figures (OOF) |
+| `figures/` | OOF evaluation of the submitted pipelines (IoU / Dice distributions, 1:n / n:1 matching, per-stage PQ, example overlays, ablation chart); `figures/from_weights/`: the same statistics recomputed from the released weights |
 
 ## Setup
 

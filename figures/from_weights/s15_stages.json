@@ -1,0 +1,27 @@
+{
+ "scorer only (LightGBM), tau 0.22": {
+  "refined": 0.4629887570662833,
+  "seed_masks": 0.4604817093305281,
+  "tau": 0.22
+ },
+ "mean(LightGBM, rsqE)": {
+  "refined": 0.46605727320287227,
+  "seed_masks": 0.463087380658025,
+  "tau": 0.22
+ },
+ "mean(LightGBM, rso4)": {
+  "refined": 0.4676783774916243,
+  "seed_masks": 0.46466385404657295,
+  "tau": 0.22
+ },
+ "mean(LightGBM, rso6)": {
+  "refined": 0.4679401327372366,
+  "seed_masks": 0.46429365556567176,
+  "tau": 0.22
+ },
+ "mean(LightGBM, rsAll) = final": {
+  "refined": 0.46718453267529475,
+  "seed_masks": 0.4642771761699913,
+  "tau": 0.22
+ }
+}
