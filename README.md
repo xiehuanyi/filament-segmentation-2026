@@ -113,8 +113,9 @@ python -m filseg.compare csv submission_s15.csv s15_ensB_ref050_rsAll.csv     # 
 ```
 
 s15 needs the maps of all 9 dense runs (the 3 students feed two extra rescorer channels); s16 reuses the 3 student
-maps when run in the same `WORK`. Stage wall times are appended to `WORK/timings.jsonl`. On one H200, 180 test
-frames: s15 RUNTIME_S15, s16 RUNTIME_S16.
+maps when run in the same `WORK`. Stage wall times are appended to `WORK/timings.jsonl`. For the 180 test frames:
+s15 21 min on two H200s (dense maps 18.6 min, everything else 2.2 min; about 40 min on one H200); s16 about 12 min on
+one H200 and 32 min on one RTX 3090. Almost all of it is the dense stage (45 or 15 fold models x 8 TTA passes).
 
 What reproduces exactly: see [Reproducibility](#reproducibility).
 
@@ -128,7 +129,7 @@ python -m filseg.evaluate --pred WORK/oof_s15.csv --work WORK --out_dir figures 
 ```
 
 The OOF run predicts each training frame with the fold model that did not see it, refits the cross-fitted
-LightGBM scorer (bit-identical to the released boosters), rebuilds the rescorer training pool (`final/pool.json`,
+LightGBM scorer (on identical candidate tables the refit is bit-identical to the released boosters), rebuilds the rescorer training pool (`final/pool.json`,
 the OOF crops of 12 candidate sets made from the same dense runs) and retrains the fold rescorers (about one
 minute each on an H200; their checkpoints are not part of the weights bundle). The pooled and per-fold PQ are
 written to `WORK/oof_s15.json`, the OOF predictions to `WORK/oof_s15.csv`.
@@ -159,7 +160,7 @@ During the competition some folds ran on V100s (`--amp fp16`) or an RTX 3090; th
 
 ## Results (5-fold OOF PQ, host metric)
 
-Numbers from our development log (`AGENT_STATUS.md` / notes); "shared scorer" rows compare dense models with one
+Numbers from our development log; "shared scorer" rows compare dense models with one
 common scorer, the others are full pipelines with their own cross-fitted scorer.
 
 | step | OOF PQ |
@@ -202,7 +203,7 @@ Checks run on 2026-11-08 (`filseg.compare` reproduces them):
 | release code vs development code on identical inputs (the development probability maps, refined crops and rescorer outputs) | every intermediate file is identical: folds, ground truth and targets; candidate tables (s15: 12003 test / 46805 OOF candidates, s16: 1859 / 7222); LightGBM boosters and cross-fitted scores; crops and extra channels. Both submitted CSVs are reproduced **byte for byte**; OOF PQ 0.4678 (s15) and 0.4669 (s16) |
 | rescorer checkpoints (not kept during development) retrained with the release code, same seeds and training pool, H200 | the test outputs of all 13 networks are bit-identical to the development runs; these retrained networks are the released checkpoints |
 | full inference from the released weights in a fresh environment (`uv pip install -r requirements.txt`), H200 | s15: 1157 / 1157 filaments, 986 identical masks, the rest matched with IoU >= 0.95 (mean IoU 0.9998), PQ of our CSV against the submitted one 0.9998. s16: 1089 / 1089, 721 identical, IoU >= 0.98, PQ 0.9997 |
-| full inference, RTX 3090 (CUDA 12.6 wheels) | REPRO_3090 |
+| full inference, RTX 3090 (CUDA 12.6 wheels) | s16: 1089 / 1089 filaments, 1088 matched (632 identical masks, mean IoU 0.9995, min 0.978), PQ against the submitted file 0.9986 |
 | OOF from the released weights (5 folds; scorer refit, rescorer pool rebuilt, fold rescorers retrained) | REPRO_OOF |
 
 Why the inference is not byte-identical: recomputed on the same GPU type and precision, the dense models are
