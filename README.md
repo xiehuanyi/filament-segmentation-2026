@@ -100,8 +100,10 @@ WEIGHTS/
   rescorer/{ensB,eS}_<name>_full.pt                  13 full-data rescorers
 ```
 
-Download: TODO (link to the hosted weights). Check a weights folder with
-`python scripts/get_weights.py --out WEIGHTS` (all files and sha256; `--pick s16` for one pick only).
+Download: the weights are on Hugging Face at
+[NightNightUp/filament-segmentation-2026](https://huggingface.co/NightNightUp/filament-segmentation-2026).
+`python scripts/get_weights.py --out WEIGHTS --hf_repo NightNightUp/filament-segmentation-2026` downloads them and
+checks every file's sha256; without `--hf_repo` it only checks an existing folder. Add `--pick s16` for one pick only.
 
 ## Reproduce the submissions (inference from the released weights)
 

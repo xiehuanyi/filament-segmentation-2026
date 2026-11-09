@@ -39,7 +39,7 @@ The inference bundle is 7.33 GB (s15 alone 6.80 GB, s16 alone 2.54 GB); the fold
 ```bash
 git clone https://github.com/xiehuanyi/filament-segmentation-2026 && cd filament-segmentation-2026
 pip install -r requirements.txt
-python scripts/get_weights.py --out WEIGHTS --hf_repo {HF_REPO}               # download + sha256 check
+python scripts/get_weights.py --out WEIGHTS --hf_repo NightNightUp/filament-segmentation-2026               # download + sha256 check
 python -m filseg.pipeline --config final/s15.json --split test --data DATA --work WORK --weights WEIGHTS \
     --out submission_s15.csv --gpus 0
 ```
