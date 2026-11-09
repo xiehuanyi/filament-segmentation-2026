@@ -221,4 +221,6 @@ pool; the resulting OOF PQ differs from the development value by -0.0006 (s15) a
 
 ## License
 
-TODO (to be chosen by the authors before publishing).
+The code in this repository and the released weights are under the MIT License (see `LICENSE`).
+The pretrained encoder weights we start from (timm / segmentation_models_pytorch), the MAGFiLO annotations and the
+GONG H-alpha frames keep their own terms.
