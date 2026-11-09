@@ -56,11 +56,12 @@ Each pick is fully described by one configuration file: `final/s15.json`, `final
 | `final/s15.json`, `final/s16.json` | the two final configurations |
 | `final/pool.json` | candidate sets that form the rescorer training pool |
 | `final/weights_manifest.csv` | every weight file with size and sha256 |
+| `final/oof_s15.csv`, `final/oof_s16.csv` | 5-fold OOF predictions of the two picks on the 707 training frames (submission format) |
 | `scripts/train_from_scratch.sh` | the full training recipe, stage by stage |
 | `scripts/get_weights.py` | downloads the weights (optional) and checks them against the manifest |
 | `scripts/make_manifest.py`, `scripts/report_figures.py` | weights manifest; per-stage PQ, example overlays and the ablation chart |
 | `experiments/` | analysis scripts (selection oracle, annotator agreement, human baselines) |
-| `demo.ipynb` | end-to-end demo on the test frames with overlays |
+| `demo.ipynb` | end-to-end notebook: data and preprocessing, weights download (or training from scratch), a short training run, inference with the intermediate stages shown, OOF evaluation with the host's metrics |
 | `figures/` | OOF evaluation of the submitted pipelines (IoU / Dice distributions, 1:n / n:1 matching, per-stage PQ, example overlays, ablation chart); `figures/from_weights/`: the same statistics recomputed from the released weights |
 
 ## Setup
@@ -103,7 +104,24 @@ WEIGHTS/
 Download: the weights are on Hugging Face at
 [NightNightUp/filament-segmentation-2026](https://huggingface.co/NightNightUp/filament-segmentation-2026).
 `python scripts/get_weights.py --out WEIGHTS --hf_repo NightNightUp/filament-segmentation-2026` downloads them and
-checks every file's sha256; without `--hf_repo` it only checks an existing folder. Add `--pick s16` for one pick only.
+checks every file's sha256 (files already present and correct are not downloaded again); without `--hf_repo` it
+only checks an existing folder. Add `--pick s16` for one pick only. `demo.ipynb` runs this step itself.
+
+## Demo notebook
+
+`demo.ipynb` (run from the repository root) goes through the whole pipeline on the competition data:
+preprocessing, model weights, inference with the intermediate stages shown on a test frame, and evaluation. It
+downloads the data with the Kaggle API if `FIL_DATA` is empty and the weights from Hugging Face, so nothing has to
+be fetched by hand. Switches in its first cell (or as environment variables):
+
+| switch | default | effect |
+|---|---|---|
+| `PICK` | `s15` | which final pipeline (`s15` or `s16`) |
+| `TRAIN_FROM_SCRATCH` | off | train every model with `scripts/train_from_scratch.sh` (~70 H200-hours) instead of downloading the weights |
+| `TRAIN_DEMO` | on | train one U-Net for 2 epochs on folds 1-4 (~3 min) to show the training code at work |
+| `RECOMPUTE_OOF` | off | recompute the OOF predictions from the weights instead of evaluating `final/oof_<pick>.csv` |
+
+The committed copy is executed with the defaults for s15 (fresh folder, weights downloaded by the notebook).
 
 ## Reproduce the submissions (inference from the released weights)
 
@@ -137,12 +155,15 @@ LightGBM scorer (on identical candidate tables the refit is bit-identical to the
 the OOF crops of 12 candidate sets made from the same dense runs) and retrains the fold rescorers (about one
 minute each on an H200; their checkpoints are not part of the weights bundle). The pooled and per-fold PQ are
 written to `WORK/oof_s15.json`, the OOF predictions to `WORK/oof_s15.csv`.
+`final/oof_s15.csv` and `final/oof_s16.csv` are the OOF predictions of our development run (OOF PQ 0.4678 / 0.4669);
+`python -m filseg.prep ...` followed by `python -m filseg.evaluate --pred final/oof_s15.csv --work WORK` scores them directly.
 
 ## Train from scratch
 
 `scripts/train_from_scratch.sh` lists every training command, stage by stage (each stage can be run alone:
 `bash scripts/train_from_scratch.sh teachers`). Per-run arguments are also stored with every checkpoint
-(`dense/<run>/args_f<k>.json`).
+(`dense/<run>/args_f<k>.json`). The last stage writes `submission_s15.csv`, `submission_s16.csv` and the OOF
+predictions `WORK/oof_s15.csv`, `WORK/oof_s16.csv`.
 
 | stage | command (per fold k) | hardware | wall time |
 |---|---|---|---|

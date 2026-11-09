@@ -119,12 +119,13 @@ fi
 if has final; then
   for name in s15 s16; do
     python - "$name" <<'PY'
-import json, sys
+import json, os, sys
 from filseg import assemble
+from filseg.paths import P
 cfg = json.load(open(f"final/{sys.argv[1]}.json")); rs = cfg["rescorer"]
-for split in ("oof", "test"):
+for split in ("oof", "test"):  # OOF predictions -> $FIL_WORK/oof_<name>.csv (evaluated by filseg.evaluate)
     assemble.run(cfg["tag"], split, rescore=rs["combine"], w_cnn=rs["w_cnn"], tau=cfg["tau"], thrs=[cfg["refiner"]["thr"]],
-                 out=None if split == "oof" else f"submission_{cfg['name']}.csv")
+                 out=os.path.join(P.work, f"oof_{cfg['name']}.csv") if split == "oof" else f"submission_{cfg['name']}.csv")
 PY
   done
 fi

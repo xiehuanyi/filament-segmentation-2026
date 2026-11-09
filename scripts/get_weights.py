@@ -1,10 +1,11 @@
 """Download the released weights (optional) and verify them against final/weights_manifest.csv.
 
-    python scripts/get_weights.py --out weights --hf_repo OWNER/REPO     # download a Hugging Face model repo, then verify
+    python scripts/get_weights.py --out weights --hf_repo OWNER/REPO     # download what is missing, then verify
     python scripts/get_weights.py --out weights                          # only verify an existing folder
-    python scripts/get_weights.py --out weights --bundle inference --pick s16   # check only what one pick needs
+    python scripts/get_weights.py --out weights --bundle inference --pick s16   # only what one pick needs
 
-Exit code 1 if a file is missing or its sha256 differs.
+With --hf_repo, files already present with the right size and sha256 are not downloaded again (so a complete
+folder needs no network). Exit code 1 if a file is still missing or its sha256 differs.
 """
 import argparse
 import csv
@@ -35,20 +36,35 @@ def main():
         rows = [r for r in rows if r["bundle"] == a.bundle]
     if a.pick:
         rows = [r for r in rows if a.pick in r["used_by"].split("+")]
-    if a.hf_repo:
+    bad = check(rows, a.out, quiet=bool(a.hf_repo))
+    if a.hf_repo and bad:
         from huggingface_hub import snapshot_download
-        snapshot_download(repo_id=a.hf_repo, revision=a.revision, local_dir=a.out, allow_patterns=[r["file"] for r in rows])
-    bad = 0
-    for r in rows:
-        p = os.path.join(a.out, r["file"])
-        if not os.path.exists(p):
-            print("missing", r["file"])
-            bad += 1
-        elif os.path.getsize(p) != int(r["bytes"]) or sha256(p) != r["sha256"]:
-            print("checksum mismatch", r["file"])
-            bad += 1
-    print(f"{len(rows) - bad}/{len(rows)} files ok ({sum(int(r['bytes']) for r in rows) / 1e9:.2f} GB)")
+        print(f"downloading {len(bad)} files ({sum(int(r['bytes']) for r in bad) / 1e9:.2f} GB) from {a.hf_repo}", flush=True)
+        for r in bad:  # a corrupt file must not be taken as already downloaded
+            p = os.path.join(a.out, r["file"])
+            if os.path.exists(p):
+                os.remove(p)
+        snapshot_download(repo_id=a.hf_repo, revision=a.revision, local_dir=a.out, allow_patterns=[r["file"] for r in bad])
+        bad = check(rows, a.out)
+    print(f"{len(rows) - len(bad)}/{len(rows)} files ok ({sum(int(r['bytes']) for r in rows) / 1e9:.2f} GB) in {a.out}")
     sys.exit(1 if bad else 0)
+
+
+def check(rows, folder, quiet=False):
+    """Rows whose file is missing or differs from the manifest (size, then sha256)."""
+    bad = []
+    for r in rows:
+        p = os.path.join(folder, r["file"])
+        if not os.path.exists(p):
+            why = "missing"
+        elif os.path.getsize(p) != int(r["bytes"]) or sha256(p) != r["sha256"]:
+            why = "checksum mismatch"
+        else:
+            continue
+        if not quiet:
+            print(why, r["file"])
+        bad.append(r)
+    return bad
 
 
 if __name__ == "__main__":

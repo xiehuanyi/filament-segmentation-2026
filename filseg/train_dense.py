@@ -148,7 +148,9 @@ def main():
         print("already done", done_flag)
         return
     lock = f"{out}/running_{tag}.lock"
-    if os.path.exists(lock) and time.time() - os.path.getmtime(lock) < 900:
+    if os.path.exists(lock) and time.time() - os.path.getmtime(lock) < 900 and \
+            open(lock).read().strip() != os.environ.get("SLURM_JOB_ID", "local"):
+        # a requeued (preempted) Slurm job keeps its job id, so its own fresh lock does not block it
         print("another job is running this fold (fresh lock); skipping", lock)
         return
     open(lock, "w").write(os.environ.get("SLURM_JOB_ID", "local"))
